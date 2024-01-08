@@ -196,107 +196,118 @@ IF "%IFCOS_INSTALL_PYTHON%"=="TRUE" (
 
 :proj
 
-set DEPENDENCY_NAME=sqlite3
-md %INSTALL_DIR%\sqlite3\lib %INSTALL_DIR%\sqlite3\bin %INSTALL_DIR%\sqlite3\include
-call :DownloadFile https://www.sqlite.org/2023/sqlite-amalgamation-3430100.zip "%DEPS_DIR%" sqlite-amalgamation-3430100.zip
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-call :ExtractArchive sqlite-amalgamation-3430100.zip "%DEPS_DIR%" "%DEPS_DIR%\sqlite-amalgamation-3430100"
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-pushd "%DEPS_DIR%\sqlite-amalgamation-3430100"
-cl /c sqlite3.c
-lib /OUT:%INSTALL_DIR%\sqlite3\lib\sqlite3.lib sqlite3.obj
-cl sqlite3.c shell.c /link /out:%INSTALL_DIR%\sqlite3\bin\sqlite3.exe
-set PATH=%PATH%;%INSTALL_DIR%\sqlite3\bin
-copy sqlite3.h %INSTALL_DIR%\sqlite3\include
-popd
+:: DONT BUILD - WE DONT NEED IT
 
-set DEPENDENCY_NAME=proj
-set DEPENDENCY_DIR=%DEPS_DIR%\proj-9.2.1
-call :DownloadFile https://download.osgeo.org/proj/proj-9.2.1.zip "%DEPS_DIR%" proj-9.2.1.zip
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-call :ExtractArchive proj-9.2.1.zip "%DEPS_DIR%" "%DEPS_DIR%\proj-9.2.1"
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-cd "%DEPENDENCY_DIR%"
-call :RunCMake -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%\proj-9.2.1" ^
-    -DSQLITE3_INCLUDE_DIR=%INSTALL_DIR%\sqlite3\include ^
-    -DSQLITE3_LIBRARY=%INSTALL_DIR%\sqlite3\lib\sqlite3.lib ^
-    -DENABLE_TIFF=Off -DENABLE_CURL=Off -DBUILD_PROJSYNC=Off ^
-    -DBUILD_SHARED_LIBS=Off ^
-    -DBUILD_TESTING=Off
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-call :BuildSolution "%DEPENDENCY_DIR%\%BUILD_DIR%\PROJ.sln" %BUILD_CFG%
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-call :InstallCMakeProject "%DEPENDENCY_DIR%\%BUILD_DIR%" %BUILD_CFG%
-IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: set DEPENDENCY_NAME=sqlite3
+:: md %INSTALL_DIR%\sqlite3\lib %INSTALL_DIR%\sqlite3\bin %INSTALL_DIR%\sqlite3\include
+:: call :DownloadFile https://www.sqlite.org/2023/sqlite-amalgamation-3430100.zip "%DEPS_DIR%" sqlite-amalgamation-3430100.zip
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: call :ExtractArchive sqlite-amalgamation-3430100.zip "%DEPS_DIR%" "%DEPS_DIR%\sqlite-amalgamation-3430100"
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: pushd "%DEPS_DIR%\sqlite-amalgamation-3430100"
+:: cl /c sqlite3.c
+:: lib /OUT:%INSTALL_DIR%\sqlite3\lib\sqlite3.lib sqlite3.obj
+:: cl sqlite3.c shell.c /link /out:%INSTALL_DIR%\sqlite3\bin\sqlite3.exe
+:: set PATH=%PATH%;%INSTALL_DIR%\sqlite3\bin
+:: copy sqlite3.h %INSTALL_DIR%\sqlite3\include
+:: popd
+::
+:: set DEPENDENCY_NAME=proj
+:: set DEPENDENCY_DIR=%DEPS_DIR%\proj-9.2.1
+:: call :DownloadFile https://download.osgeo.org/proj/proj-9.2.1.zip "%DEPS_DIR%" proj-9.2.1.zip
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: call :ExtractArchive proj-9.2.1.zip "%DEPS_DIR%" "%DEPS_DIR%\proj-9.2.1"
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: cd "%DEPENDENCY_DIR%"
+:: call :RunCMake -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%\proj-9.2.1" ^
+::     -DSQLITE3_INCLUDE_DIR=%INSTALL_DIR%\sqlite3\include ^
+::     -DSQLITE3_LIBRARY=%INSTALL_DIR%\sqlite3\lib\sqlite3.lib ^
+::     -DENABLE_TIFF=Off -DENABLE_CURL=Off -DBUILD_PROJSYNC=Off ^
+::     -DBUILD_SHARED_LIBS=Off ^
+::     -DBUILD_TESTING=Off
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: call :BuildSolution "%DEPENDENCY_DIR%\%BUILD_DIR%\PROJ.sln" %BUILD_CFG%
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: call :InstallCMakeProject "%DEPENDENCY_DIR%\%BUILD_DIR%" %BUILD_CFG%
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
 
 
 :mpir
-set DEPENDENCY_NAME=mpir
-set DEPENDENCY_DIR=%DEPS_DIR%\mpir
-call :GitCloneAndCheckoutRevision https://github.com/BrianGladman/mpir.git "%DEPENDENCY_DIR%"
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-cd "%DEPENDENCY_DIR%"
-git reset --hard
-git clean -fdx
-REM There probably need to be quotes here around the filename
-powershell -c "get-content %~dp0patches\mpir.patch | %%{$_ -replace \"sdk\",\"%UCRTVersion%\"} | %%{$_ -replace \"fn\",\"lib_mpir_cxx\"}" | git apply --unidiff-zero --ignore-whitespace
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-powershell -c "get-content %~dp0patches\mpir.patch | %%{$_ -replace \"sdk\",\"%UCRTVersion%\"} | %%{$_ -replace \"fn\",\"lib_mpir_gc\"}" | git apply --unidiff-zero --ignore-whitespace 
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-if NOT "%USE_STATIC_RUNTIME%"=="FALSE" git apply "%~dp0patches\mpir_runtime.patch" --unidiff-zero --ignore-whitespace
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-cd msvc
-cd vs%VS_VER:~2,2%
-call .\msbuild.bat gc LIB %VS_PLATFORM% %DEBUG_OR_RELEASE%
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-IF NOT EXIST "%INSTALL_DIR%\mpir". mkdir "%INSTALL_DIR%\mpir"
-copy ..\..\lib\%VS_PLATFORM%\%DEBUG_OR_RELEASE%\* "%INSTALL_DIR%\mpir"
-IF NOT %ERRORLEVEL%==0 GOTO :Error
+
+:: DONT BUILD - WE DONT NEED IT
+
+:: set DEPENDENCY_NAME=mpir
+:: set DEPENDENCY_DIR=%DEPS_DIR%\mpir
+:: call :GitCloneAndCheckoutRevision https://github.com/BrianGladman/mpir.git "%DEPENDENCY_DIR%"
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: cd "%DEPENDENCY_DIR%"
+:: git reset --hard
+:: git clean -fdx
+:: REM There probably need to be quotes here around the filename
+:: powershell -c "get-content %~dp0patches\mpir.patch | %%{$_ -replace \"sdk\",\"%UCRTVersion%\"} | %%{$_ -replace \"fn\",\"lib_mpir_cxx\"}" | git apply --unidiff-zero --ignore-whitespace
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: powershell -c "get-content %~dp0patches\mpir.patch | %%{$_ -replace \"sdk\",\"%UCRTVersion%\"} | %%{$_ -replace \"fn\",\"lib_mpir_gc\"}" | git apply --unidiff-zero --ignore-whitespace
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: if NOT "%USE_STATIC_RUNTIME%"=="FALSE" git apply "%~dp0patches\mpir_runtime.patch" --unidiff-zero --ignore-whitespace
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: cd msvc
+:: cd vs%VS_VER:~2,2%
+:: call .\msbuild.bat gc LIB %VS_PLATFORM% %DEBUG_OR_RELEASE%
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: IF NOT EXIST "%INSTALL_DIR%\mpir". mkdir "%INSTALL_DIR%\mpir"
+:: copy ..\..\lib\%VS_PLATFORM%\%DEBUG_OR_RELEASE%\* "%INSTALL_DIR%\mpir"
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
 
 :mpfr
-set DEPENDENCY_NAME=mpfr
-set DEPENDENCY_DIR=%DEPS_DIR%\mpfr
-call :GitCloneAndCheckoutRevision https://github.com/aothms/mpfr.git "%DEPENDENCY_DIR%" 2ebbe10fd029a480cf6e8a64c493afa9f3654251
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-cd "%DEPENDENCY_DIR%"
-git reset --hard
-powershell -c "get-content %~dp0patches\mpfr.patch | %%{$_ -replace \"sdk\",\"%UCRTVersion%\"} | %%{$_ -replace \"fn\",\"lib_mpfr\"}" | git apply --unidiff-zero --ignore-whitespace
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-if NOT "%USE_STATIC_RUNTIME%"=="FALSE" git apply "%~dp0patches\mpfr_runtime.patch" --unidiff-zero --ignore-whitespace
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-if "%VS_VER%"=="2017" (
-  set mpfr_sln=build.vc15
-  set orig_platform_toolset=v141
-) else (
-  set mpfr_sln=build.vs19
-  set orig_platform_toolset=v142
-)
-powershell -c "get-childitem %DEPENDENCY_DIR%\%mpfr_sln% -recurse -include *.vcxproj | select -expand fullname | foreach { (Get-Content $_) -replace '%orig_platform_toolset%', 'v%VC_VER:.=%' | Set-Content $_ }"
-call :BuildSolution "%DEPENDENCY_DIR%\%mpfr_sln%\lib_mpfr.sln" %DEBUG_OR_RELEASE% lib_mpfr
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-REM This command fails because not all msvc projects are patched with the right sdk version
-IF NOT EXIST lib\%VS_PLATFORM%\%DEBUG_OR_RELEASE%\mpfr.lib GOTO :Error
-IF NOT EXIST "%INSTALL_DIR%\mpfr". mkdir "%INSTALL_DIR%\mpfr"
-copy lib\%VS_PLATFORM%\%DEBUG_OR_RELEASE%\* "%INSTALL_DIR%\mpfr"
-IF NOT %ERRORLEVEL%==0 GOTO :Error
+
+:: DONT BUILD - WE DONT NEED IT
+
+:: set DEPENDENCY_NAME=mpfr
+:: set DEPENDENCY_DIR=%DEPS_DIR%\mpfr
+:: call :GitCloneAndCheckoutRevision https://github.com/aothms/mpfr.git "%DEPENDENCY_DIR%" 2ebbe10fd029a480cf6e8a64c493afa9f3654251
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: cd "%DEPENDENCY_DIR%"
+:: git reset --hard
+:: powershell -c "get-content %~dp0patches\mpfr.patch | %%{$_ -replace \"sdk\",\"%UCRTVersion%\"} | %%{$_ -replace \"fn\",\"lib_mpfr\"}" | git apply --unidiff-zero --ignore-whitespace
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: if NOT "%USE_STATIC_RUNTIME%"=="FALSE" git apply "%~dp0patches\mpfr_runtime.patch" --unidiff-zero --ignore-whitespace
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: if "%VS_VER%"=="2017" (
+::   set mpfr_sln=build.vc15
+::   set orig_platform_toolset=v141
+:: ) else (
+::   set mpfr_sln=build.vs19
+::   set orig_platform_toolset=v142
+:: )
+:: powershell -c "get-childitem %DEPENDENCY_DIR%\%mpfr_sln% -recurse -include *.vcxproj | select -expand fullname | foreach { (Get-Content $_) -replace '%orig_platform_toolset%', 'v%VC_VER:.=%' | Set-Content $_ }"
+:: call :BuildSolution "%DEPENDENCY_DIR%\%mpfr_sln%\lib_mpfr.sln" %DEBUG_OR_RELEASE% lib_mpfr
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: REM This command fails because not all msvc projects are patched with the right sdk version
+:: IF NOT EXIST lib\%VS_PLATFORM%\%DEBUG_OR_RELEASE%\mpfr.lib GOTO :Error
+:: IF NOT EXIST "%INSTALL_DIR%\mpfr". mkdir "%INSTALL_DIR%\mpfr"
+:: copy lib\%VS_PLATFORM%\%DEBUG_OR_RELEASE%\* "%INSTALL_DIR%\mpfr"
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
 
 :HDF5
-set DEPENDENCY_NAME=hdf5
-set DEPENDENCY_DIR=%DEPS_DIR%
-cd "%DEPENDENCY_DIR%"
-set HDF5_CMAKE_ZIP=CMake-hdf5-%HDF5_VERSION%.zip
-set HDF5_INSTALL_ZIP_NAME=HDF5-%HDF5_VERSION%-win%ARCH_BITS%
-if "%ARCH_BITS%"=="64" set ARCH_BITS_64=64
-call :DownloadFile http://support.hdfgroup.org/ftp/HDF5/releases/hdf5-%HDF5_VERSION_MAJOR%/hdf5-%HDF5_VERSION%/src/CMake-hdf5-%HDF5_VERSION%.zip "%DEPS_DIR%" %HDF5_CMAKE_ZIP%
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-call :ExtractArchive %HDF5_CMAKE_ZIP% "%DEPS_DIR%" "%DEPS_DIR%\CMake-hdf5-%HDF5_VERSION%"
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-pushd "%DEPS_DIR%\CMake-hdf5-%HDF5_VERSION%"
-git apply %~dp0patches\hdf5vs2022.patch --ignore-whitespace
-rem It is not checked whether this patch is applied successfully!
-ctest -S HDF5config.cmake,BUILD_GENERATOR=VS%VS_VER%%ARCH_BITS_64% -C %BUILD_CFG% -V -O hdf5.log
-call :ExtractArchive %HDF5_INSTALL_ZIP_NAME%.zip "%INSTALL_DIR%" "%INSTALL_DIR%\%HDF5_INSTALL_ZIP_NAME%"
-popd
+
+:: DONT BUILD - WE DONT NEED IT
+
+:: set DEPENDENCY_NAME=hdf5
+:: set DEPENDENCY_DIR=%DEPS_DIR%
+:: cd "%DEPENDENCY_DIR%"
+:: set HDF5_CMAKE_ZIP=CMake-hdf5-%HDF5_VERSION%.zip
+:: set HDF5_INSTALL_ZIP_NAME=HDF5-%HDF5_VERSION%-win%ARCH_BITS%
+:: if "%ARCH_BITS%"=="64" set ARCH_BITS_64=64
+:: call :DownloadFile http://support.hdfgroup.org/ftp/HDF5/releases/hdf5-%HDF5_VERSION_MAJOR%/hdf5-%HDF5_VERSION%/src/CMake-hdf5-%HDF5_VERSION%.zip "%DEPS_DIR%" %HDF5_CMAKE_ZIP%
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: call :ExtractArchive %HDF5_CMAKE_ZIP% "%DEPS_DIR%" "%DEPS_DIR%\CMake-hdf5-%HDF5_VERSION%"
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: pushd "%DEPS_DIR%\CMake-hdf5-%HDF5_VERSION%"
+:: git apply %~dp0patches\hdf5vs2022.patch --ignore-whitespace
+:: rem It is not checked whether this patch is applied successfully!
+:: ctest -S HDF5config.cmake,BUILD_GENERATOR=VS%VS_VER%%ARCH_BITS_64% -C %BUILD_CFG% -V -O hdf5.log
+:: call :ExtractArchive %HDF5_INSTALL_ZIP_NAME%.zip "%INSTALL_DIR%" "%INSTALL_DIR%\%HDF5_INSTALL_ZIP_NAME%"
+:: popd
 
 :: Note all of the dependencies have appropriate label so that user can easily skip something if wanted
 :: by modifying this file and using goto.
@@ -341,174 +352,192 @@ call .\b2 toolset=%BOOST_TOOLSET% runtime-link=shared address-model=%ARCH_BITS% 
 IF NOT %ERRORLEVEL%==0 GOTO :Error
 
 :JSON
-set DEPENDENCY_NAME=JSON for Modern C++ v3.6.1
-IF NOT EXIST "%INSTALL_DIR%\json\nlohmann". mkdir "%INSTALL_DIR%\json\nlohmann"
-call :DownloadFile https://github.com/nlohmann/json/releases/download/v3.6.1/json.hpp "%INSTALL_DIR%\json\nlohmann" json.hpp
+
+:: DONT BUILD - WE DONT NEED IT
+
+:: set DEPENDENCY_NAME=JSON for Modern C++ v3.6.1
+:: IF NOT EXIST "%INSTALL_DIR%\json\nlohmann". mkdir "%INSTALL_DIR%\json\nlohmann"
+:: call :DownloadFile https://github.com/nlohmann/json/releases/download/v3.6.1/json.hpp "%INSTALL_DIR%\json\nlohmann" json.hpp
 
 :OpenCOLLADA
-:: Note OpenCOLLADA has only Release and Debug builds.
-set DEPENDENCY_NAME=OpenCOLLADA
-set DEPENDENCY_DIR=%DEPS_DIR%\OpenCOLLADA
-:: Use a fixed revision in order to prevent introducing breaking changes
-call :GitCloneAndCheckoutRevision https://github.com/KhronosGroup/OpenCOLLADA.git "%DEPENDENCY_DIR%" 064a60b65c2c31b94f013820856bc84fb1937cc6
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-cd "%DEPENDENCY_DIR%"
-:: Debug build of OpenCOLLADAValidator fails (https://github.com/KhronosGroup/OpenCOLLADA/issues/377) so
-:: so disable it from the build altogether as we have no use for it
-findstr #add_subdirectory(COLLADAValidator) CMakeLists.txt>NUL
-IF NOT %ERRORLEVEL%==0 git apply --reject --whitespace=fix "%~dp0patches\OpenCOLLADA_CMakeLists.txt.patch" --ignore-whitespace
-:: NOTE OpenCOLLADA has been observed to have problems with switching between debug and release builds so
-:: uncomment to following line in order to delete the CMakeCache.txt always if experiencing problems.
-REM IF EXIST "%DEPENDENCY_DIR%\%BUILD_DIR%\CMakeCache.txt". del "%DEPENDENCY_DIR%\%BUILD_DIR%\CMakeCache.txt"
-:: NOTE Enforce that the embedded LibXml2 and PCRE are used as there might be problems with arbitrary versions of the libraries.
-call :RunCMake -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%\OpenCOLLADA" -DUSE_STATIC_MSVC_RUNTIME=0 -DCMAKE_DEBUG_POSTFIX=d ^
-               -DLIBXML2_LIBRARIES="" -DLIBXML2_INCLUDE_DIR="" -DPCRE_INCLUDE_DIR="" -DPCRE_LIBRARIES=""
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-REM IF NOT EXIST "%DEPS_DIR%\OpenCOLLADA\%BUILD_DIR%\lib\%DEBUG_OR_RELEASE%\OpenCOLLADASaxFrameworkLoader.lib".
-call :BuildSolution "%DEPENDENCY_DIR%\%BUILD_DIR%\OPENCOLLADA.sln" %DEBUG_OR_RELEASE%
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-call :InstallCMakeProject "%DEPENDENCY_DIR%\%BUILD_DIR%" %DEBUG_OR_RELEASE%
-IF NOT %ERRORLEVEL%==0 GOTO :Error
+
+:: DONT BUILD - WE DONT NEED IT
+
+:: :: Note OpenCOLLADA has only Release and Debug builds.
+:: set DEPENDENCY_NAME=OpenCOLLADA
+:: set DEPENDENCY_DIR=%DEPS_DIR%\OpenCOLLADA
+:: :: Use a fixed revision in order to prevent introducing breaking changes
+:: call :GitCloneAndCheckoutRevision https://github.com/KhronosGroup/OpenCOLLADA.git "%DEPENDENCY_DIR%" 064a60b65c2c31b94f013820856bc84fb1937cc6
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: cd "%DEPENDENCY_DIR%"
+:: :: Debug build of OpenCOLLADAValidator fails (https://github.com/KhronosGroup/OpenCOLLADA/issues/377) so
+:: :: so disable it from the build altogether as we have no use for it
+:: findstr #add_subdirectory(COLLADAValidator) CMakeLists.txt>NUL
+:: IF NOT %ERRORLEVEL%==0 git apply --reject --whitespace=fix "%~dp0patches\OpenCOLLADA_CMakeLists.txt.patch" --ignore-whitespace
+:: :: NOTE OpenCOLLADA has been observed to have problems with switching between debug and release builds so
+:: :: uncomment to following line in order to delete the CMakeCache.txt always if experiencing problems.
+:: REM IF EXIST "%DEPENDENCY_DIR%\%BUILD_DIR%\CMakeCache.txt". del "%DEPENDENCY_DIR%\%BUILD_DIR%\CMakeCache.txt"
+:: :: NOTE Enforce that the embedded LibXml2 and PCRE are used as there might be problems with arbitrary versions of the libraries.
+:: call :RunCMake -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%\OpenCOLLADA" -DUSE_STATIC_MSVC_RUNTIME=0 -DCMAKE_DEBUG_POSTFIX=d ^
+::                -DLIBXML2_LIBRARIES="" -DLIBXML2_INCLUDE_DIR="" -DPCRE_INCLUDE_DIR="" -DPCRE_LIBRARIES=""
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: REM IF NOT EXIST "%DEPS_DIR%\OpenCOLLADA\%BUILD_DIR%\lib\%DEBUG_OR_RELEASE%\OpenCOLLADASaxFrameworkLoader.lib".
+:: call :BuildSolution "%DEPENDENCY_DIR%\%BUILD_DIR%\OPENCOLLADA.sln" %DEBUG_OR_RELEASE%
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: call :InstallCMakeProject "%DEPENDENCY_DIR%\%BUILD_DIR%" %DEBUG_OR_RELEASE%
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
 
 :OCCT
-SET OCCT_VER=V%OCCT_VERSION:.=_%
 
-:: OCCT has many dependencies but FreeType is the only mandatory
-set DEPENDENCY_NAME=FreeType
-set DEPENDENCY_DIR=%DEPS_DIR%\freetype-2.7.1
-set FREETYPE_ZIP=ft271.zip
-cd "%DEPS_DIR%"
-call :DownloadFile http://download.savannah.gnu.org/releases/freetype/%FREETYPE_ZIP% "%DEPS_DIR%" %FREETYPE_ZIP%
-if not %ERRORLEVEL%==0 goto :Error
-call :ExtractArchive %FREETYPE_ZIP% "%DEPS_DIR%" "%DEPENDENCY_DIR%"
-if not %ERRORLEVEL%==0 goto :Error
-cd "%DEPENDENCY_DIR%"
-:: NOTE FreeType is built as a static library by default
-call :RunCMake -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%\freetype"
-if not %ERRORLEVEL%==0 goto :Error
-call :BuildSolution "%DEPENDENCY_DIR%\%BUILD_DIR%\freetype.sln" %BUILD_CFG%
-if not %ERRORLEVEL%==0 goto :Error
-call :InstallCMakeProject "%DEPENDENCY_DIR%\%BUILD_DIR%" %BUILD_CFG%
-if not %ERRORLEVEL%==0 goto :Error 
+:: DONT BUILD OPENCASCADE - WE WILL USE THE ONE FROM RFEM
 
-set DEPENDENCY_NAME=Open CASCADE %OCCT_VERSION%
-set DEPENDENCY_DIR=%DEPS_DIR%\occt_git
-cd "%DEPS_DIR%"
-call :GitCloneAndCheckoutRevision https://github.com/Open-Cascade-SAS/OCCT "%DEPENDENCY_DIR%" %OCCT_VER%
-if not %ERRORLEVEL%==0 goto :Error
-
-:: Patching always blindly would trigger a rebuild each time
-findstr IfcOpenShell "%DEPENDENCY_DIR%\CMakeLists.txt">NUL
-if not %ERRORLEVEL%==0 (
-    pushd "%DEPENDENCY_DIR%"
-    git apply --ignore-whitespace ""%~dp0patches\%OCCT_VER%.patch"
-    popd
-)
-findstr IfcOpenShell "%DEPENDENCY_DIR%\CMakeLists.txt">NUL
-if not %ERRORLEVEL%==0 goto :Error
-
-cd "%DEPENDENCY_DIR%"
-call :RunCMake -DINSTALL_DIR="%INSTALL_DIR%\opencascade-%OCCT_VERSION%" -DBUILD_LIBRARY_TYPE="Static" -DCMAKE_DEBUG_POSTFIX=d ^
-    -DBUILD_MODULE_Draw=0 -D3RDPARTY_FREETYPE_DIR="%INSTALL_DIR%\freetype"
-if not %ERRORLEVEL%==0 goto :Error
-
-:: whole program optimization avoids Visual C++ hanging when compiling 32-bit release OCCT up to version 7.4.0
-IF %ARCH_BITS%==32 (
-	IF %BUILD_CFG%==Release (
-		SET COMPILE_WITH_WPO=TRUE
-	)
-)
-
-call :BuildSolution "%DEPENDENCY_DIR%\%BUILD_DIR%\OCCT.sln" %BUILD_CFG%
-if not %ERRORLEVEL%==0 goto :Error
-call :InstallCMakeProject "%DEPENDENCY_DIR%\%BUILD_DIR%" %BUILD_CFG%
-if not %ERRORLEVEL%==0 goto :Error
-
-SET COMPILE_WITH_WPO=FALSE
-
-:: Use a single lib directory for release and debug libraries as is done with OCE
-if not exist "%OCC_LIBRARY_DIR%". mkdir "%OCC_LIBRARY_DIR%"
-:: NOTE OCCT (at least occt-V7_0_0-9059ca1) directory creation code is hardcoded and doesn't seem handle future VC versions
-set OCCT_VC_VER=%VC_VER%
-IF %OCCT_VC_VER% GTR 14 (
-    set OCCT_VC_VER=14
-)
-move /y "%INSTALL_DIR%\opencascade-%OCCT_VERSION%\win%ARCH_BITS%\vc%OCCT_VC_VER%\libi\*.*" "%OCC_LIBRARY_DIR%"
-move /y "%INSTALL_DIR%\opencascade-%OCCT_VERSION%\win%ARCH_BITS%\vc%OCCT_VC_VER%\libd\*.*" "%OCC_LIBRARY_DIR%"
-move /y "%INSTALL_DIR%\opencascade-%OCCT_VERSION%\win%ARCH_BITS%\vc%OCCT_VC_VER%\lib\*.*" "%OCC_LIBRARY_DIR%"
-rmdir /s /q "%INSTALL_DIR%\opencascade-%OCCT_VERSION%\win%ARCH_BITS%\vc%OCCT_VC_VER%"
-:: Removed unneeded bits
-rmdir /s /q "%INSTALL_DIR%\opencascade-%OCCT_VERSION%\data"
-rmdir /s /q "%INSTALL_DIR%\opencascade-%OCCT_VERSION%\samples"
-del "%INSTALL_DIR%\opencascade-%OCCT_VERSION%\*.bat"
+:: SET OCCT_VER=V%OCCT_VERSION:.=_%
+::
+:: :: OCCT has many dependencies but FreeType is the only mandatory
+:: set DEPENDENCY_NAME=FreeType
+:: set DEPENDENCY_DIR=%DEPS_DIR%\freetype-2.7.1
+:: set FREETYPE_ZIP=ft271.zip
+:: cd "%DEPS_DIR%"
+:: call :DownloadFile http://download.savannah.gnu.org/releases/freetype/%FREETYPE_ZIP% "%DEPS_DIR%" %FREETYPE_ZIP%
+:: if not %ERRORLEVEL%==0 goto :Error
+:: call :ExtractArchive %FREETYPE_ZIP% "%DEPS_DIR%" "%DEPENDENCY_DIR%"
+:: if not %ERRORLEVEL%==0 goto :Error
+:: cd "%DEPENDENCY_DIR%"
+:: :: NOTE FreeType is built as a static library by default
+:: call :RunCMake -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%\freetype"
+:: if not %ERRORLEVEL%==0 goto :Error
+:: call :BuildSolution "%DEPENDENCY_DIR%\%BUILD_DIR%\freetype.sln" %BUILD_CFG%
+:: if not %ERRORLEVEL%==0 goto :Error
+:: call :InstallCMakeProject "%DEPENDENCY_DIR%\%BUILD_DIR%" %BUILD_CFG%
+:: if not %ERRORLEVEL%==0 goto :Error
+::
+:: set DEPENDENCY_NAME=Open CASCADE %OCCT_VERSION%
+:: set DEPENDENCY_DIR=%DEPS_DIR%\occt_git
+:: cd "%DEPS_DIR%"
+:: call :GitCloneAndCheckoutRevision https://github.com/Open-Cascade-SAS/OCCT "%DEPENDENCY_DIR%" %OCCT_VER%
+:: if not %ERRORLEVEL%==0 goto :Error
+::
+:: :: Patching always blindly would trigger a rebuild each time
+:: findstr IfcOpenShell "%DEPENDENCY_DIR%\CMakeLists.txt">NUL
+:: if not %ERRORLEVEL%==0 (
+::     pushd "%DEPENDENCY_DIR%"
+::     git apply --ignore-whitespace ""%~dp0patches\%OCCT_VER%.patch"
+::     popd
+:: )
+:: findstr IfcOpenShell "%DEPENDENCY_DIR%\CMakeLists.txt">NUL
+:: if not %ERRORLEVEL%==0 goto :Error
+::
+:: cd "%DEPENDENCY_DIR%"
+:: call :RunCMake -DINSTALL_DIR="%INSTALL_DIR%\opencascade-%OCCT_VERSION%" -DBUILD_LIBRARY_TYPE="Static" -DCMAKE_DEBUG_POSTFIX=d ^
+::     -DBUILD_MODULE_Draw=0 -D3RDPARTY_FREETYPE_DIR="%INSTALL_DIR%\freetype"
+:: if not %ERRORLEVEL%==0 goto :Error
+::
+:: :: whole program optimization avoids Visual C++ hanging when compiling 32-bit release OCCT up to version 7.4.0
+:: IF %ARCH_BITS%==32 (
+:: 	IF %BUILD_CFG%==Release (
+:: 		SET COMPILE_WITH_WPO=TRUE
+:: 	)
+:: )
+::
+:: call :BuildSolution "%DEPENDENCY_DIR%\%BUILD_DIR%\OCCT.sln" %BUILD_CFG%
+:: if not %ERRORLEVEL%==0 goto :Error
+:: call :InstallCMakeProject "%DEPENDENCY_DIR%\%BUILD_DIR%" %BUILD_CFG%
+:: if not %ERRORLEVEL%==0 goto :Error
+::
+:: SET COMPILE_WITH_WPO=FALSE
+::
+:: :: Use a single lib directory for release and debug libraries as is done with OCE
+:: if not exist "%OCC_LIBRARY_DIR%". mkdir "%OCC_LIBRARY_DIR%"
+:: :: NOTE OCCT (at least occt-V7_0_0-9059ca1) directory creation code is hardcoded and doesn't seem handle future VC versions
+:: set OCCT_VC_VER=%VC_VER%
+:: IF %OCCT_VC_VER% GTR 14 (
+::     set OCCT_VC_VER=14
+:: )
+:: move /y "%INSTALL_DIR%\opencascade-%OCCT_VERSION%\win%ARCH_BITS%\vc%OCCT_VC_VER%\libi\*.*" "%OCC_LIBRARY_DIR%"
+:: move /y "%INSTALL_DIR%\opencascade-%OCCT_VERSION%\win%ARCH_BITS%\vc%OCCT_VC_VER%\libd\*.*" "%OCC_LIBRARY_DIR%"
+:: move /y "%INSTALL_DIR%\opencascade-%OCCT_VERSION%\win%ARCH_BITS%\vc%OCCT_VC_VER%\lib\*.*" "%OCC_LIBRARY_DIR%"
+:: rmdir /s /q "%INSTALL_DIR%\opencascade-%OCCT_VERSION%\win%ARCH_BITS%\vc%OCCT_VC_VER%"
+:: :: Removed unneeded bits
+:: rmdir /s /q "%INSTALL_DIR%\opencascade-%OCCT_VERSION%\data"
+:: rmdir /s /q "%INSTALL_DIR%\opencascade-%OCCT_VERSION%\samples"
+:: del "%INSTALL_DIR%\opencascade-%OCCT_VERSION%\*.bat"
 
 :Python
-set DEPENDENCY_NAME=Python %PYTHON_VERSION%
-set DEPENDENCY_DIR=N/A
-set PYTHON_AMD64_POSTFIX=.amd64
-:: NOTE/TODO Beginning from 3.5.0: set PYTHON_AMD64_POSTFIX=-amd64
-IF NOT %TARGET_ARCH%==x64 set PYTHON_AMD64_POSTFIX=
-:: NOTE/TODO 3.5.0 doesn't use MSI any longer, but exe: set PYTHON_INSTALLER=python-%PYTHON_VERSION%%PYTHON_AMD64_POSTFIX%.exe
-set PYTHON_INSTALLER=python-%PYTHON_VERSION%%PYTHON_AMD64_POSTFIX%.msi
 
-IF "%IFCOS_INSTALL_PYTHON%"=="TRUE" (
-    cd "%DEPS_DIR%"
-    call :DownloadFile https://www.python.org/ftp/python/%PYTHON_VERSION%/%PYTHON_INSTALLER% "%DEPS_DIR%" %PYTHON_INSTALLER%
-    IF NOT %ERRORLEVEL%==0 GOTO :Error
-    REM Uninstall if build Rebuild/Clean used
-    IF NOT %BUILD_TYPE%==Build (
-        call cecho.cmd 0 13 "Uninstalling %DEPENDENCY_NAME%. Please be patient, this will take a while."
-        msiexec /x %PYTHON_INSTALLER% /qn
-    )
+:: DONT INSTALL - WE DONT NEED IT
 
-    IF NOT EXIST "%PYTHONHOME%". (
-        call cecho.cmd 0 13 "Installing %DEPENDENCY_NAME%. Please be patient, this will take a while."
-        msiexec /qn /i %PYTHON_INSTALLER% TARGETDIR="%PYTHONHOME%"
-    ) ELSE (
-        call cecho.cmd 0 13 "%DEPENDENCY_NAME% already installed. Skipping."
-    )
-) ELSE (
-    call cecho.cmd 0 13 "IFCOS_INSTALL_PYTHON not true, skipping installation of Python."
-)
+:: set DEPENDENCY_NAME=Python %PYTHON_VERSION%
+:: set DEPENDENCY_DIR=N/A
+:: set PYTHON_AMD64_POSTFIX=.amd64
+:: :: NOTE/TODO Beginning from 3.5.0: set PYTHON_AMD64_POSTFIX=-amd64
+:: IF NOT %TARGET_ARCH%==x64 set PYTHON_AMD64_POSTFIX=
+:: :: NOTE/TODO 3.5.0 doesn't use MSI any longer, but exe: set PYTHON_INSTALLER=python-%PYTHON_VERSION%%PYTHON_AMD64_POSTFIX%.exe
+:: set PYTHON_INSTALLER=python-%PYTHON_VERSION%%PYTHON_AMD64_POSTFIX%.msi
+::
+:: IF "%IFCOS_INSTALL_PYTHON%"=="TRUE" (
+::     cd "%DEPS_DIR%"
+::     call :DownloadFile https://www.python.org/ftp/python/%PYTHON_VERSION%/%PYTHON_INSTALLER% "%DEPS_DIR%" %PYTHON_INSTALLER%
+::     IF NOT %ERRORLEVEL%==0 GOTO :Error
+::     REM Uninstall if build Rebuild/Clean used
+::     IF NOT %BUILD_TYPE%==Build (
+::         call cecho.cmd 0 13 "Uninstalling %DEPENDENCY_NAME%. Please be patient, this will take a while."
+::         msiexec /x %PYTHON_INSTALLER% /qn
+::     )
+::
+::     IF NOT EXIST "%PYTHONHOME%". (
+::         call cecho.cmd 0 13 "Installing %DEPENDENCY_NAME%. Please be patient, this will take a while."
+::         msiexec /qn /i %PYTHON_INSTALLER% TARGETDIR="%PYTHONHOME%"
+::     ) ELSE (
+::         call cecho.cmd 0 13 "%DEPENDENCY_NAME% already installed. Skipping."
+::     )
+:: ) ELSE (
+::     call cecho.cmd 0 13 "IFCOS_INSTALL_PYTHON not true, skipping installation of Python."
+:: )
 
 :SWIG
-set SWIG_VERSION=3.0.12
-set DEPENDENCY_NAME=SWIG %SWIG_VERSION%
-set DEPENDENCY_DIR=N/A
-set SWIG_ZIP=swigwin-%SWIG_VERSION%.zip
-cd "%DEPS_DIR%"
-call :DownloadFile https://sourceforge.net/projects/swig/files/swigwin/swigwin-%SWIG_VERSION%/%SWIG_ZIP% "%DEPS_DIR%" %SWIG_ZIP%
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-call :ExtractArchive %SWIG_ZIP% "%DEPS_DIR%" "%DEPS_DIR%\swigwin"
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-IF EXIST "%DEPS_DIR%\swigwin-%SWIG_VERSION%". (
-    pushd "%DEPS_DIR%"
-    ren swigwin-%SWIG_VERSION% swigwin
-    popd
-)
-IF EXIST "%DEPS_DIR%\swigwin\". robocopy "%DEPS_DIR%\swigwin" "%INSTALL_DIR%\swigwin" /E /IS /MOVE /njh /njs
+
+:: DONT BUILD - WE DONT NEED IT
+
+:: set SWIG_VERSION=3.0.12
+:: set DEPENDENCY_NAME=SWIG %SWIG_VERSION%
+:: set DEPENDENCY_DIR=N/A
+:: set SWIG_ZIP=swigwin-%SWIG_VERSION%.zip
+:: cd "%DEPS_DIR%"
+:: call :DownloadFile https://sourceforge.net/projects/swig/files/swigwin/swigwin-%SWIG_VERSION%/%SWIG_ZIP% "%DEPS_DIR%" %SWIG_ZIP%
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: call :ExtractArchive %SWIG_ZIP% "%DEPS_DIR%" "%DEPS_DIR%\swigwin"
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: IF EXIST "%DEPS_DIR%\swigwin-%SWIG_VERSION%". (
+::     pushd "%DEPS_DIR%"
+::     ren swigwin-%SWIG_VERSION% swigwin
+::     popd
+:: )
+:: IF EXIST "%DEPS_DIR%\swigwin\". robocopy "%DEPS_DIR%\swigwin" "%INSTALL_DIR%\swigwin" /E /IS /MOVE /njh /njs
 
 :cgal
-set DEPENDENCY_NAME=cgal
-set DEPENDENCY_DIR=%DEPS_DIR%\cgal
-call :GitCloneAndCheckoutRevision https://github.com/CGAL/cgal.git "%DEPENDENCY_DIR%" v5.2.3
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-cd "%DEPENDENCY_DIR%"
-git reset --hard
-git apply --ignore-whitespace "%~dp0patches\cgal_no_zlib.patch"
-call :RunCMake -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%\cgal"    ^
-               -DBOOST_ROOT="%DEPS_DIR%\boost_%BOOST_VER%"    ^
-               -DGMP_INCLUDE_DIR="%INSTALL_DIR%\mpir"         ^
-               -DGMP_LIBRARIES="%INSTALL_DIR%\mpir\mpir.lib"  ^
-               -DMPFR_INCLUDE_DIR="%INSTALL_DIR%\mpfr"        ^
-               -DMPFR_LIBRARIES="%INSTALL_DIR%\mpfr\mpfr.lib" ^
-               -DCGAL_HEADER_ONLY=On                          ^
-               -DBOOST_LIBRARYDIR="%DEPS_DIR%\boost_%BOOST_VER%\stage\vs%VS_VER%-%VS_PLATFORM%\lib"
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-call :BuildSolution "%DEPENDENCY_DIR%\%BUILD_DIR%\CGAL.sln" %BUILD_CFG%
-IF NOT %ERRORLEVEL%==0 GOTO :Error
-call :InstallCMakeProject "%DEPENDENCY_DIR%\%BUILD_DIR%" %BUILD_CFG%
-IF NOT %ERRORLEVEL%==0 GOTO :Error
+
+:: DONT BUILD - WE DONT NEED IT
+
+:: set DEPENDENCY_NAME=cgal
+:: set DEPENDENCY_DIR=%DEPS_DIR%\cgal
+:: call :GitCloneAndCheckoutRevision https://github.com/CGAL/cgal.git "%DEPENDENCY_DIR%" v5.2.3
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: cd "%DEPENDENCY_DIR%"
+:: git reset --hard
+:: git apply --ignore-whitespace "%~dp0patches\cgal_no_zlib.patch"
+:: call :RunCMake -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%\cgal"    ^
+::                -DBOOST_ROOT="%DEPS_DIR%\boost_%BOOST_VER%"    ^
+::                -DGMP_INCLUDE_DIR="%INSTALL_DIR%\mpir"         ^
+::                -DGMP_LIBRARIES="%INSTALL_DIR%\mpir\mpir.lib"  ^
+::                -DMPFR_INCLUDE_DIR="%INSTALL_DIR%\mpfr"        ^
+::                -DMPFR_LIBRARIES="%INSTALL_DIR%\mpfr\mpfr.lib" ^
+::                -DCGAL_HEADER_ONLY=On                          ^
+::                -DBOOST_LIBRARYDIR="%DEPS_DIR%\boost_%BOOST_VER%\stage\vs%VS_VER%-%VS_PLATFORM%\lib"
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: call :BuildSolution "%DEPENDENCY_DIR%\%BUILD_DIR%\CGAL.sln" %BUILD_CFG%
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
+:: call :InstallCMakeProject "%DEPENDENCY_DIR%\%BUILD_DIR%" %BUILD_CFG%
+:: IF NOT %ERRORLEVEL%==0 GOTO :Error
 
 :Successful
 echo.
