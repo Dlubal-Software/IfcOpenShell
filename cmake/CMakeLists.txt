@@ -418,7 +418,7 @@ if(BUILD_IFCGEOM)
 
     if(MSVC)
         add_definitions(-DHAVE_NO_DLL)
-        add_debug_variants(OPENCASCADE_LIBRARIES "${OPENCASCADE_LIBRARIES}" d)
+        #add_debug_variants(OPENCASCADE_LIBRARIES "${OPENCASCADE_LIBRARIES}" d) // Our version does not have the 'd' postfix
     endif()
 
     if(WIN32)
