@@ -375,10 +375,7 @@ if(BUILD_IFCGEOM)
 
     set(OPENCASCADE_LIBRARY_NAMES
         TKernel TKMath TKBRep TKGeomBase TKGeomAlgo TKG3d TKG2d TKShHealing TKTopAlgo TKMesh TKPrim TKBool TKBO
-        TKFillet TKSTEP TKSTEPBase TKSTEPAttr TKXSBase TKSTEP209 TKIGES TKOffset TKHLR
-
-        # @todo investigate the exact conditions when this is necessary
-        TKBin
+        TKFillet TKSTEP TKSTEPBase TKSTEPAttr TKXSBase TKSTEP209 TKOffset TKHLR
     )
 
     if("${OCC_LIBRARY_DIR}" STREQUAL "")
