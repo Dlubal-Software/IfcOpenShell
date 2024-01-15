@@ -12,5 +12,3 @@ This branch has been customized to be easier to build for RFEM/RSTAB.
 	`set OCC_LIBRARY_DIR=d:\Sources\R20_2\lib_win64_msvc\debug\`
 5. run `run-cmake.bat`
 6. build the generated solution with Visual Studio
-
-NOTE: currently the build fails with error `LINK : fatal error LNK1189: library limit of 65535 objects exceeded`. See https://github.com/IfcOpenShell/IfcOpenShell/issues/1029
